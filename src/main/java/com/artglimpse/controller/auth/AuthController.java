@@ -1,4 +1,4 @@
-package com.artglimpse.controller;
+package com.artglimpse.controller.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,12 +10,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import com.artglimpse.model.User;
-import com.artglimpse.repository.UserRepository;
-import com.artglimpse.security.JwtTokenUtil;
-import com.artglimpse.service.JwtResponse;
-import com.artglimpse.service.LoginRequest;
-import com.artglimpse.service.SignupRequest;
+import com.artglimpse.model.auth.User;
+import com.artglimpse.repository.auth.UserRepository;
+import com.artglimpse.security.auth.JwtTokenUtil;
+import com.artglimpse.service.auth.JwtResponse;
+import com.artglimpse.service.auth.LoginRequest;
+import com.artglimpse.service.auth.SignupRequest;
 
 @RestController
 @RequestMapping("/api/auth")

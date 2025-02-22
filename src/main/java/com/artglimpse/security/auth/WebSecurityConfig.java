@@ -1,4 +1,4 @@
-package com.artglimpse.security;
+package com.artglimpse.security.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

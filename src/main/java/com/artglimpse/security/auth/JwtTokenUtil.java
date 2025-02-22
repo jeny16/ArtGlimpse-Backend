@@ -1,4 +1,4 @@
-package com.artglimpse.security;
+package com.artglimpse.security.auth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
