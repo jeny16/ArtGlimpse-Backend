@@ -1,4 +1,4 @@
-package com.artglimpse.security;
+package com.artglimpse.security.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -7,6 +7,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.IOException;

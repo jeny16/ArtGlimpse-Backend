@@ -29,7 +29,7 @@
 //     }
 // }
 
-package com.artglimpse.security;
+package com.artglimpse.security.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -37,8 +37,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
-import com.artglimpse.repository.UserRepository;
-import com.artglimpse.model.User;
+import com.artglimpse.model.auth.User;
+import com.artglimpse.repository.auth.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.artglimpse.service;
+package com.artglimpse.service.auth;
 
 public class JwtResponse {
     private String token;

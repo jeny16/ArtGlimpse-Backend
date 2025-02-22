@@ -1,4 +1,4 @@
-package com.artglimpse.model;
+package com.artglimpse.model.auth;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

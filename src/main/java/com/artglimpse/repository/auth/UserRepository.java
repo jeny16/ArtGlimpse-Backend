@@ -1,7 +1,9 @@
-package com.artglimpse.repository;
+package com.artglimpse.repository.auth;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import com.artglimpse.model.User;
+
+import com.artglimpse.model.auth.User;
+
 import java.util.Optional;
 
 public interface UserRepository extends MongoRepository<User, String> {
