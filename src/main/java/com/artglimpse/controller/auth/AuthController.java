@@ -65,3 +65,24 @@ public class AuthController {
         }
     }
 }
+
+// @PostMapping("/login")
+// public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+//     try {
+//         Authentication authentication = authenticationManager.authenticate(
+//                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+//         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+//         // Extract only the username (or email) from the authenticated user
+//         org.springframework.security.core.userdetails.User userDetails = 
+//                 (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+        
+//         // Pass only the username to the token generator
+//         String jwt = jwtTokenUtil.generateToken(userDetails.getUsername());
+        
+//         return ResponseEntity.ok(new JwtResponse(jwt));
+//     } catch (BadCredentialsException ex) {
+//         return ResponseEntity.status(401).body("Error: Invalid username or password");
+//     }
+// }
+
