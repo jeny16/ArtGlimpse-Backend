@@ -7,6 +7,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,32 +59,22 @@ public class AuthController {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtTokenUtil
-                    .generateToken((org.springframework.security.core.userdetails.User) authentication.getPrincipal());
-            return ResponseEntity.ok(new JwtResponse(jwt));
+
+            // Retrieve the UserDetails instance from the authentication object
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            // Retrieve the user entity to get the MongoDB _id (ensure your User model
+            // defines id as your MongoDB _id)
+            User user = userRepository.findByEmail(loginRequest.getEmail())
+                    .orElseThrow(() -> new UsernameNotFoundException(
+                            "User not found with email: " + loginRequest.getEmail()));
+
+            // IMPORTANT: Pass the MongoDB user id (as a string) so that the token subject
+
+            // is the ObjectId.
+            String jwt = jwtTokenUtil.generateToken(userDetails, user.getId().toString());
+            return ResponseEntity.ok(new JwtResponse(jwt, user.getId()));
         } catch (BadCredentialsException ex) {
             return ResponseEntity.status(401).body("Error: Invalid username or password");
         }
     }
 }
-
-// @PostMapping("/login")
-// public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-//     try {
-//         Authentication authentication = authenticationManager.authenticate(
-//                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-//         SecurityContextHolder.getContext().setAuthentication(authentication);
-
-//         // Extract only the username (or email) from the authenticated user
-//         org.springframework.security.core.userdetails.User userDetails = 
-//                 (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
-        
-//         // Pass only the username to the token generator
-//         String jwt = jwtTokenUtil.generateToken(userDetails.getUsername());
-        
-//         return ResponseEntity.ok(new JwtResponse(jwt));
-//     } catch (BadCredentialsException ex) {
-//         return ResponseEntity.status(401).body("Error: Invalid username or password");
-//     }
-// }
-
