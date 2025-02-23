@@ -1,5 +1,6 @@
 package com.artglimpse.controller.product;
 
+import com.artglimpse.dto.product.WishlistRequest;
 import com.artglimpse.model.product.Wishlist;
 import com.artglimpse.service.product.WishlistService;
 
@@ -44,28 +45,5 @@ public class WishlistController {
             return ResponseEntity.ok(updatedWishlist);
         }
         return ResponseEntity.notFound().build();
-    }
-}
-
-// DTO for incoming requests to add a product
-class WishlistRequest {
-    private String userId;
-    private String productId;
-
-    // Getters and setters (or you can use Lombok annotations here)
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getProductId() {
-        return productId;
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
     }
 }

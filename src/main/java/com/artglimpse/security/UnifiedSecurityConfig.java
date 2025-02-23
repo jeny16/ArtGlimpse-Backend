@@ -67,16 +67,17 @@ public class UnifiedSecurityConfig {
     }
 
     // Unified security filter chain configuration
-    @Bean  
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {  
-        http  
-            // Disable CSRF for simplicity (enable it in production if needed)
-            .csrf().disable()  
-            // Use stateless sessions since we're using JWT
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            // Define endpoint-specific security rules
-            .authorizeRequests()
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .cors().and()
+                .csrf().disable()
+                // Use stateless sessions since we're using JWT
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                // Define endpoint-specific security rules
+                .authorizeRequests()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // Allow public access to authentication endpoints and product GET endpoints
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/products/**").permitAll()
@@ -86,11 +87,12 @@ public class UnifiedSecurityConfig {
                 .antMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN")
                 // Any other request must be authenticated
                 .anyRequest().authenticated()
-            .and()
-            // Optionally enable HTTP Basic authentication for testing or fallback
-            .httpBasic();
-        
-        // Add the JWT filter before the UsernamePasswordAuthenticationFilter in the filter chain
+                .and()
+                // Optionally enable HTTP Basic authentication for testing or fallback
+                .httpBasic();
+
+        // Add the JWT filter before the UsernamePasswordAuthenticationFilter in the
+        // filter chain
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();  
