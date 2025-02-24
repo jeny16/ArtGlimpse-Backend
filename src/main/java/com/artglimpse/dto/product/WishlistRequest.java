@@ -4,7 +4,9 @@ public class WishlistRequest {
     private String userId;
     private String productId;
 
-    // Getters and setters (or you can use Lombok annotations here)
+    public WishlistRequest() {
+    }
+
     public String getUserId() {
         return userId;
     }
