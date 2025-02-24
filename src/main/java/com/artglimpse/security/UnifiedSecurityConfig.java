@@ -90,6 +90,10 @@ public class UnifiedSecurityConfig {
                 .antMatchers(HttpMethod.POST, "/wishlist/**").permitAll()
                 .antMatchers(HttpMethod.PUT, "/wishlist/**").permitAll()
                 .antMatchers(HttpMethod.DELETE, "/wishlist/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/cart/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/cart/**").permitAll()
+                .antMatchers(HttpMethod.PUT, "/cart/**").permitAll()
+                .antMatchers(HttpMethod.DELETE, "/cart/**").permitAll()
                 // Any other request must be authenticated
                 .anyRequest().authenticated()
                 .and()

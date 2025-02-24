@@ -5,7 +5,9 @@ public class CartRequest {
     private String productId;
     private int quantity;
 
-    // Getters and Setters
+    public CartRequest() {
+    }
+
     public String getUserId() {
         return userId;
     }
