@@ -1,10 +1,11 @@
 package com.artglimpse.repository.product;
 
-import com.artglimpse.model.product.Product;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
+import com.artglimpse.model.product.Product;
+import java.util.List;
 
 @Repository
 public interface ProductRepository extends MongoRepository<Product, String> {
-    // Additional query methods can be defined here for filterization in the future.
+    List<Product> findAllById(Iterable<String> ids);
 }

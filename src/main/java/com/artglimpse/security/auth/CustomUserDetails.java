@@ -24,10 +24,12 @@ public class CustomUserDetails implements UserDetails {
         this.authorities = authorities;
     }
 
+    // Updated build method: call toString() on the user id so it's a valid ObjectId
+    // hex string
     public static CustomUserDetails build(User user) {
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole()));
         return new CustomUserDetails(
-                user.getId(),
+                user.getId().toString(), // ensure the ID is a valid hex string
                 user.getEmail(),
                 user.getPassword(),
                 authorities);
