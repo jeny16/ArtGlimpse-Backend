@@ -81,6 +81,7 @@ public class UnifiedSecurityConfig {
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // Allow public access to authentication endpoints and product GET endpoints
                 .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/user/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/products/**").permitAll()
                 // Only users with the ADMIN role can modify product resources
                 .antMatchers(HttpMethod.POST, "/products/**").hasRole("ADMIN")
