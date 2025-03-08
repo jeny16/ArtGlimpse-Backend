@@ -95,6 +95,10 @@ public class UnifiedSecurityConfig {
                 .antMatchers(HttpMethod.POST, "/cart/**").permitAll()
                 .antMatchers(HttpMethod.PUT, "/cart/**").permitAll()
                 .antMatchers(HttpMethod.DELETE, "/cart/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/chat").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/chat").permitAll()
+                .antMatchers(HttpMethod.PUT, "/api/chat").permitAll()
+                .antMatchers(HttpMethod.DELETE, "/api/chat").permitAll()
                 // Any other request must be authenticated
                 .anyRequest().authenticated()
                 .and()
