@@ -2,6 +2,7 @@ package com.artglimpse.controller.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +19,9 @@ import com.artglimpse.security.auth.JwtTokenUtil;
 import com.artglimpse.service.auth.JwtResponse;
 import com.artglimpse.service.auth.LoginRequest;
 import com.artglimpse.service.auth.SignupRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import io.jsonwebtoken.Claims;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -117,5 +121,25 @@ public class AuthController {
     @PostMapping("/seller/login")
     public ResponseEntity<?> authenticateSeller(@RequestBody LoginRequest loginRequest) {
         return processAuthentication(loginRequest, "ROLE_SELLER");
+    }
+
+    // --- New Endpoint for Token Validation ---
+    @GetMapping("/validate")
+    public ResponseEntity<?> validateToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header == null || !header.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid Authorization header");
+        }
+        String token = header.substring(7);
+        try {
+            Claims claims = jwtTokenUtil.getClaimsFromToken(token);
+            String userId = claims.getSubject();
+            if (!userRepository.existsById(userId)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User no longer exists");
+            }
+            return ResponseEntity.ok("Token is valid");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
     }
 }
