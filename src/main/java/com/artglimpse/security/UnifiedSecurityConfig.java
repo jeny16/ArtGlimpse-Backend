@@ -17,8 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.artglimpse.security.auth.CustomUserDetailsService;
-import com.artglimpse.security.auth.JwtAuthenticationFilter;
+import com.artglimpse.authentication.service.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
