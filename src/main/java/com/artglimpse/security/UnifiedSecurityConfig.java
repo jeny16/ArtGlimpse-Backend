@@ -98,6 +98,7 @@ public class UnifiedSecurityConfig {
                 .antMatchers(HttpMethod.POST, "/api/chat").permitAll()
                 .antMatchers(HttpMethod.PUT, "/api/chat").permitAll()
                 .antMatchers(HttpMethod.DELETE, "/api/chat").permitAll()
+                .antMatchers("/api/seller/**").hasRole("SELLER")
                 // Any other request must be authenticated
                 .anyRequest().authenticated()
                 .and()
