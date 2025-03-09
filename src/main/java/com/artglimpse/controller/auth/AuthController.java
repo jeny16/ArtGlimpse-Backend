@@ -28,57 +28,99 @@ import io.jsonwebtoken.Claims;
 public class AuthController {
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    JwtTokenUtil jwtTokenUtil;
+    private JwtTokenUtil jwtTokenUtil;
 
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody SignupRequest signupRequest) {
+    // ---------------------------
+    // Common Helper Methods
+    // ---------------------------
+
+    /**
+     * Processes authentication for both buyer and seller.
+     * If expectedRole is provided, it verifies the user has the required role.
+     */
+    private ResponseEntity<?> processAuthentication(LoginRequest loginRequest, String expectedRole) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            // Get user details and user entity from the database
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            User user = userRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + loginRequest.getEmail()));
+
+            // If an expected role is provided, verify it matches the user's role
+            if (expectedRole != null && !expectedRole.equals(user.getRole())) {
+                return ResponseEntity.status(401).body("Error: Unauthorized - Incorrect role");
+            }
+
+            // Generate JWT using the user details and MongoDB user ID
+            String jwt = jwtTokenUtil.generateToken(userDetails, user.getId().toString());
+            return ResponseEntity.ok(new JwtResponse(jwt, user.getId()));
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(401).body("Error: Invalid username or password");
+        }
+    }
+
+    /**
+     * Processes registration for both buyer and seller.
+     * The role parameter determines the role assigned to the new user.
+     */
+    private ResponseEntity<?> processRegistration(SignupRequest signupRequest, String role) {
         if (userRepository.existsByUsername(signupRequest.getUsername())) {
             return ResponseEntity.badRequest().body("Error: Username is already taken!");
         }
         if (userRepository.existsByEmail(signupRequest.getEmail())) {
             return ResponseEntity.badRequest().body("Error: Email is already in use!");
         }
-        // Create new user account
+        // Create a new user with the provided role (buyer or seller)
         User user = new User(
-                signupRequest.getUsername(),
-                signupRequest.getEmail(),
-                passwordEncoder.encode(signupRequest.getPassword()),
-                "ROLE_USER");
+            signupRequest.getUsername(),
+            signupRequest.getEmail(),
+            passwordEncoder.encode(signupRequest.getPassword()),
+            role
+        );
         userRepository.save(user);
-        return ResponseEntity.ok("User registered successfully!");
+        return ResponseEntity.ok("User registered successfully with role: " + role);
+    }
+
+    // ---------------------------
+    // Buyer Endpoints
+    // ---------------------------
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> registerUser(@RequestBody SignupRequest signupRequest) {
+        return processRegistration(signupRequest, "ROLE_USER");
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        // For buyer login, we don't need to enforce a specific role in the helper method.
+        return processAuthentication(loginRequest, null);
+    }
 
-            // Retrieve the UserDetails instance from the authentication object
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            // Retrieve the user entity to get the MongoDB _id (ensure your User model
-            // defines id as your MongoDB _id)
-            User user = userRepository.findByEmail(loginRequest.getEmail())
-                    .orElseThrow(() -> new UsernameNotFoundException(
-                            "User not found with email: " + loginRequest.getEmail()));
+    // ---------------------------
+    // Seller Endpoints
+    // ---------------------------
 
-            // IMPORTANT: Pass the MongoDB user id (as a string) so that the token subject
-            // is the ObjectId.
-            String jwt = jwtTokenUtil.generateToken(userDetails, user.getId().toString());
-            return ResponseEntity.ok(new JwtResponse(jwt, user.getId()));
-        } catch (BadCredentialsException ex) {
-            return ResponseEntity.status(401).body("Error: Invalid username or password");
-        }
+    @PostMapping("/seller/signup")
+    public ResponseEntity<?> registerSeller(@RequestBody SignupRequest signupRequest) {
+        return processRegistration(signupRequest, "ROLE_SELLER");
+    }
+
+    @PostMapping("/seller/login")
+    public ResponseEntity<?> authenticateSeller(@RequestBody LoginRequest loginRequest) {
+        return processAuthentication(loginRequest, "ROLE_SELLER");
     }
 
     // --- New Endpoint for Token Validation ---
