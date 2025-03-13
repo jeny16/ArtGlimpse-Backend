@@ -26,19 +26,16 @@ public class UnifiedSecurityConfig {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
-    // JWT filter for validating tokens on incoming requests
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter();
     }
 
-    // Password encoder bean
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // In-memory user details manager (for testing purposes)
     @Bean
     public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
         UserDetails admin = User.withDefaultPasswordEncoder()
@@ -47,17 +44,21 @@ public class UnifiedSecurityConfig {
                 .roles("ADMIN")
                 .build();
 
+        UserDetails seller = User.withDefaultPasswordEncoder()
+                .username("seller")
+                .password("sellerpassword")
+                .roles("SELLER")
+                .build();
+
         UserDetails user = User.withDefaultPasswordEncoder()
                 .username("user")
                 .password("userpassword")
                 .roles("USER")
                 .build();
 
-        return new InMemoryUserDetailsManager(admin, user);
+        return new InMemoryUserDetailsManager(admin, seller, user);
     }
 
-    // Configure AuthenticationManager using your custom user details service and
-    // password encoder.
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
@@ -66,23 +67,18 @@ public class UnifiedSecurityConfig {
                 .and().build();
     }
 
-    // Unified security filter chain configuration
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors().and()
                 .csrf().disable()
-                // Use stateless sessions since we're using JWT
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                // Define endpoint-specific security rules
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // Allow public access to authentication endpoints and product GET endpoints
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/api/user/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/products/**").permitAll()
-                // Only users with the ADMIN role can modify product resources
                 .antMatchers(HttpMethod.POST, "/products/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.PUT, "/products/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN")
@@ -96,17 +92,15 @@ public class UnifiedSecurityConfig {
                 .antMatchers(HttpMethod.DELETE, "/cart/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/chat").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/chat").permitAll()
-                .antMatchers(HttpMethod.PUT, "/api/chat").permitAll()
-                .antMatchers(HttpMethod.DELETE, "/api/chat").permitAll()
-                .antMatchers("/api/seller/**").hasRole("SELLER")
-                // Any other request must be authenticated
+                .antMatchers(HttpMethod.POST, "/api/seller/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/stats").permitAll()  // Any logged-in user can view stats
+                // .antMatchers(HttpMethod.POST, "/api/stats").hasRole("SELLER")  // Only sellers can update stats
+                // .antMatchers(HttpMethod.PUT, "/api/stats").hasRole("SELLER")  // Only sellers can modify stats
+                .antMatchers("/seller/**").hasRole("SELLER")
                 .anyRequest().authenticated()
                 .and()
-                // Optionally enable HTTP Basic authentication for testing or fallback
                 .httpBasic();
 
-        // Add the JWT filter before the UsernamePasswordAuthenticationFilter in the
-        // filter chain
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
