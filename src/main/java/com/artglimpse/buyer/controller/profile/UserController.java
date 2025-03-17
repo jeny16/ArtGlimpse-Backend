@@ -3,8 +3,8 @@ package com.artglimpse.buyer.controller.profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.artglimpse.buyer.dto.auth.ProfileResponse;
 import com.artglimpse.buyer.dto.auth.UserProfileUpdateRequest;
-import com.artglimpse.buyer.model.profile.BuyerProfile;
 import com.artglimpse.buyer.service.profile.UserService;
 
 @RestController
@@ -14,22 +14,22 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // GET endpoint to fetch user profile data by userId (passed as query param)
+    // GET merged profile endpoint (User + BuyerProfile)
     @GetMapping("/profile")
-    public ResponseEntity<BuyerProfile> getProfile(@RequestParam String userId) {
-        BuyerProfile profile = userService.getUserProfile(userId);
+    public ResponseEntity<ProfileResponse> getProfile(@RequestParam String userId) {
+        ProfileResponse profile = userService.getUserProfile(userId);
         return ResponseEntity.ok(profile);
     }
 
-    // PUT endpoint to update the user profile (checkout details or profile edits)
+    // PUT endpoint to update profile data (both common user and buyer profile)
     @PutMapping("/profile")
-    public ResponseEntity<BuyerProfile> updateProfile(@RequestParam String userId,
+    public ResponseEntity<ProfileResponse> updateProfile(@RequestParam String userId,
             @RequestBody UserProfileUpdateRequest request) {
-        BuyerProfile updatedProfile = userService.updateUserProfile(userId, request);
+        ProfileResponse updatedProfile = userService.updateUserProfile(userId, request);
         return ResponseEntity.ok(updatedProfile);
     }
 
-    // DELETE endpoint to delete the entire user account and related data.
+    // DELETE endpoint to delete user and related data
     @DeleteMapping("/profile")
     public ResponseEntity<?> deleteUserProfile(@RequestParam String userId) {
         if (!userService.existsById(userId)) {
