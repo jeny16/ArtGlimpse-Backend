@@ -12,45 +12,39 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/seller/products")  // Updated base URL to match security configuration
-@CrossOrigin(origins = "*")
+@RequestMapping("/api/seller/products")
+@CrossOrigin(origins = {"http://localhost:5174"}, allowCredentials = "true")
 public class AddProductController {
 
     @Autowired
     private AddProductService addProductService;
 
-    // Create a new product (with file upload support)
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<AddProduct> addProduct(
-            @RequestPart("product") AddProductDTO addProductDTO, // JSON data
-            @RequestPart(value = "images", required = false) MultipartFile[] images // Image files
+            @RequestPart("product") AddProductDTO addProductDTO,
+            @RequestPart(value = "images", required = false) MultipartFile[] images
     ) {
         AddProduct createdProduct = addProductService.addProduct(addProductDTO, images);
         return ResponseEntity.status(201).body(createdProduct);
     }
-    
 
-    // Get all products
     @GetMapping
     public List<AddProduct> getAllProducts() {
         return addProductService.getAllProducts();
     }
 
-    // Get product by ID
     @GetMapping("/{id}")
     public ResponseEntity<AddProduct> getProductById(@PathVariable String id) {
         Optional<AddProduct> product = addProductService.getProductById(id);
         return product.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    // Update product
     @PutMapping("/{id}")
     public ResponseEntity<AddProduct> updateProduct(@PathVariable String id, @RequestBody AddProduct product) {
         AddProduct updatedProduct = addProductService.updateProduct(id, product);
         return ResponseEntity.ok(updatedProduct);
     }
 
-    // Delete product
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable String id) {
         addProductService.deleteProduct(id);

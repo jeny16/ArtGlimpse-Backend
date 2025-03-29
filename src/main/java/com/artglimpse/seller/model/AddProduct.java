@@ -30,6 +30,10 @@ public class AddProduct {
     private String tags;
     private List<String> images;
 
+    // No-argument constructor
+    public AddProduct() {
+    }
+
     // Getters and Setters
     public String getId() {
         return id;
@@ -132,5 +136,29 @@ public class AddProduct {
     }
     public void setImages(List<String> images) {
         this.images = images;
+    }
+
+    // Optional: Override toString() for debugging purposes
+    @Override
+    public String toString() {
+        return "AddProduct{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", currency='" + currency + '\'' +
+                ", stock=" + stock +
+                ", category='" + category + '\'' +
+                ", discount=" + discount +
+                ", percentageDiscount=" + percentageDiscount +
+                ", validUntilDiscount=" + validUntilDiscount +
+                ", processingTime='" + processingTime + '\'' +
+                ", shippingTime='" + shippingTime + '\'' +
+                ", shippingCost=" + shippingCost +
+                ", estimatedDelivery=" + estimatedDelivery +
+                ", materialsMade='" + materialsMade + '\'' +
+                ", tags='" + tags + '\'' +
+                ", images=" + images +
+                '}';
     }
 }
