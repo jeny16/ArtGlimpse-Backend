@@ -1,5 +1,6 @@
 package com.artglimpse.buyer.controller.product;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,8 @@ public class OrderController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<List<Order>> getOrders(@PathVariable String userId) {
-        List<Order> orders = orderService.getOrdersByUser(userId);
+        ObjectId userObjectId = new ObjectId(userId);
+        List<Order> orders = orderService.getOrdersByUser(userObjectId);
         return ResponseEntity.ok(orders);
     }
 }

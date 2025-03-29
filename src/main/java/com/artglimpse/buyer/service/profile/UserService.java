@@ -37,28 +37,46 @@ public class UserService {
                                 profile.getPaymentMethods());
         }
 
-        // Updated updateUserProfile method: create BuyerProfile if not present
+        // Updated updateUserProfile method: replace the addresses field entirely
         public ProfileResponse updateUserProfile(String userId, UserProfileUpdateRequest request) {
-                // Update common user fields using fullName and email from the request
+                // Update common user fields
                 User user = userRepository.findById(userId)
                                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-                user.setUsername(request.getUsername());
-                user.setEmail(request.getEmail());
+                if (request.getUsername() != null && !request.getUsername().isEmpty()) {
+                        user.setUsername(request.getUsername());
+                }
+                if (request.getEmail() != null && !request.getEmail().isEmpty()) {
+                        user.setEmail(request.getEmail());
+                }
                 userRepository.save(user);
 
-                // Update or create buyer profile fields
-                BuyerProfile profile = buyerProfileRepository.findById(userId).orElse(null);
-                if (profile == null) {
-                        profile = new BuyerProfile();
-                        profile.setId(userId);
+                // Update buyer profile fields
+                BuyerProfile profile = buyerProfileRepository.findById(userId).orElse(new BuyerProfile());
+                profile.setId(userId);
+
+                // Replace addresses entirely with the incoming addresses array
+                if (request.getAddresses() != null) {
+                        profile.setAddresses(request.getAddresses());
                 }
-                profile.setAddresses(request.getAddresses());
-                profile.setMobile(request.getMobile());
-                profile.setPaymentMethods(request.getPaymentMethods());
-                profile.setGender(request.getGender());
-                profile.setDateOfBirth(request.getDateOfBirth());
-                profile.setHintName(request.getHintName());
-                profile.setAlternateMobile(request.getAlternateMobile());
+                // Update other profile fields as needed
+                if (request.getMobile() != null && !request.getMobile().isEmpty()) {
+                        profile.setMobile(request.getMobile());
+                }
+                if (request.getPaymentMethods() != null && !request.getPaymentMethods().isEmpty()) {
+                        profile.setPaymentMethods(request.getPaymentMethods());
+                }
+                if (request.getGender() != null && !request.getGender().isEmpty()) {
+                        profile.setGender(request.getGender());
+                }
+                if (request.getDateOfBirth() != null && !request.getDateOfBirth().isEmpty()) {
+                        profile.setDateOfBirth(request.getDateOfBirth());
+                }
+                if (request.getHintName() != null && !request.getHintName().isEmpty()) {
+                        profile.setHintName(request.getHintName());
+                }
+                if (request.getAlternateMobile() != null && !request.getAlternateMobile().isEmpty()) {
+                        profile.setAlternateMobile(request.getAlternateMobile());
+                }
                 BuyerProfile updatedProfile = buyerProfileRepository.save(profile);
 
                 return new ProfileResponse(
