@@ -17,17 +17,17 @@ public class AddProductDTO {
     private String category;
     private Boolean discount;
     private Integer percentageDiscount;
-
+  
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate validUntilDiscount;
-
+    
     private String processingTime;
     private String shippingTime;
     private BigDecimal shippingCost;
-
+    
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate estimatedDelivery;
-
+   
     private String materialsMade;
     private String tags;
 

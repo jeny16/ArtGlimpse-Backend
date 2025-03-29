@@ -24,13 +24,37 @@ public class UnifiedSecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public UnifiedSecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
+        UserDetails admin = User.withDefaultPasswordEncoder()
+                .username("admin")
+                .password("adminpassword")
+                .roles("ADMIN")
+                .build();
+
+        UserDetails seller = User.withDefaultPasswordEncoder()
+                .username("seller")
+                .password("sellerpassword")
+                .roles("SELLER")
+                .build();
+
+        UserDetails user = User.withDefaultPasswordEncoder()
+                .username("user")
+                .password("userpassword")
+                .roles("USER")
+                .build();
+
+        return new InMemoryUserDetailsManager(admin, seller, user);
     }
 
     @Bean
@@ -76,7 +100,6 @@ public class UnifiedSecurityConfig {
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 

@@ -1,6 +1,7 @@
 package com.artglimpse.buyer.model.product;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.bson.types.ObjectId;
 import com.artglimpse.buyer.model.profile.BuyerProfile;
@@ -21,12 +22,12 @@ public class Cart {
 
     private List<CartItem> items = new ArrayList<>();
 
-    // New fields
     private Double donationAmount; // May be null
     private String couponCode; // May be null
 
-    // Transient field to hold full buyer profile data (populated in service)
-    private transient BuyerProfile userData;
+    // Use Spring Data's @Transient annotation to ensure this field is not persisted
+    @Transient
+    private BuyerProfile userData;
 
     public Cart() {
     }

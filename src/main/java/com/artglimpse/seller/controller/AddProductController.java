@@ -12,22 +12,23 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/seller/products")
-@CrossOrigin(origins = {"http://localhost:5174"}, allowCredentials = "true")
+@RequestMapping("/api/seller/products")  // Updated base URL to match security configuration
+@CrossOrigin(origins = "*")
 public class AddProductController {
 
     @Autowired
     private AddProductService addProductService;
 
+    // Create a new product (with file upload support)
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<AddProduct> addProduct(
-            @RequestPart("product") AddProductDTO addProductDTO,
-            @RequestPart(value = "images", required = false) MultipartFile[] images
+            @RequestPart("product") AddProductDTO addProductDTO, // JSON data
+            @RequestPart(value = "images", required = false) MultipartFile[] images // Image files
     ) {
         AddProduct createdProduct = addProductService.addProduct(addProductDTO, images);
         return ResponseEntity.status(201).body(createdProduct);
     }
-
+  
     @GetMapping
     public List<AddProduct> getAllProducts() {
         return addProductService.getAllProducts();
