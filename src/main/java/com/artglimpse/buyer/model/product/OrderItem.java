@@ -1,25 +1,36 @@
 package com.artglimpse.buyer.model.product;
 
+import org.bson.types.ObjectId;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import org.springframework.data.annotation.Transient;
+
 public class OrderItem {
-    private String productId;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private ObjectId productId;
+
     private int quantity;
     private double price; // Price at the time of order
+
+    // Transient field to hold the complete product data
+    @Transient
+    private Product productData;
 
     public OrderItem() {
     }
 
-    public OrderItem(String productId, int quantity, double price) {
+    public OrderItem(ObjectId productId, int quantity, double price) {
         this.productId = productId;
         this.quantity = quantity;
         this.price = price;
     }
 
     // Getters and setters
-    public String getProductId() {
+    public ObjectId getProductId() {
         return productId;
     }
 
-    public void setProductId(String productId) {
+    public void setProductId(ObjectId productId) {
         this.productId = productId;
     }
 
@@ -37,5 +48,13 @@ public class OrderItem {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public Product getProductData() {
+        return productData;
+    }
+
+    public void setProductData(Product productData) {
+        this.productData = productData;
     }
 }

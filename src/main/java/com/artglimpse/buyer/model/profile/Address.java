@@ -1,6 +1,12 @@
 package com.artglimpse.buyer.model.profile;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.data.annotation.Id;
+import java.util.UUID;
+
 public class Address {
+    @Id
+    private String id;
     private String name;
     private String street;
     private String city;
@@ -8,14 +14,20 @@ public class Address {
     private String zip;
     private String country;
     private String mobile;
+
+    @JsonProperty("isDefault")
     private boolean isDefault;
+
     private String addressType;
 
     public Address() {
+        this.id = UUID.randomUUID().toString();
     }
 
-    public Address(String name, String street, String city, String state, String zip, String country, boolean isDefault,
+    public Address(String id, String name, String street, String city, String state, String zip, String country,
+            boolean isDefault,
             String addressType, String mobile) {
+        this.id = (id == null || id.isEmpty()) ? UUID.randomUUID().toString() : id;
         this.name = name;
         this.street = street;
         this.city = city;
@@ -28,6 +40,17 @@ public class Address {
     }
 
     // Getters and Setters
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        // If a null value is provided, generate a new UUID.
+        this.id = (id == null || id.isEmpty()) ? UUID.randomUUID().toString() : id;
+    }
+
+    // (Other getters and setters remain unchanged)
     public String getName() {
         return name;
     }
@@ -84,12 +107,14 @@ public class Address {
         this.country = country;
     }
 
+    @JsonProperty("isDefault")
     public boolean isDefault() {
         return isDefault;
     }
 
-    public void setDefault(boolean aDefault) {
-        isDefault = aDefault;
+    @JsonProperty("isDefault")
+    public void setDefault(boolean isDefault) {
+        this.isDefault = isDefault;
     }
 
     public String getAddressType() {

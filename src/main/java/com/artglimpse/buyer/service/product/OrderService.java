@@ -10,7 +10,8 @@ import com.artglimpse.buyer.model.product.OrderItem;
 import com.artglimpse.buyer.model.profile.Address;
 import com.artglimpse.buyer.repository.product.CartRepository;
 import com.artglimpse.buyer.repository.product.OrderRepository;
-
+import com.artglimpse.buyer.repository.product.ProductRepository;
+import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +25,10 @@ public class OrderService {
     @Autowired
     private CartRepository cartRepository;
 
-    public Order createOrder(String userId, Cart cart, Address shippingAddress) {
+    @Autowired
+    private ProductRepository productRepository;
+
+    public Order createOrder(ObjectId userId, Cart cart, Address shippingAddress) {
         double totalMRP = 0.0;
         double totalDiscount = 0.0;
         double shippingCost = 0.0;
@@ -51,25 +55,38 @@ public class OrderService {
         List<OrderItem> orderItems = new ArrayList<>();
         for (CartItem item : cart.getItems()) {
             OrderItem orderItem = new OrderItem(
-                    item.getProductId().toString(),
+                    item.getProductId(), // Already an ObjectId
                     item.getQuantity(),
-                    item.getProductData().getPrice()
-            );
+                    item.getProductData().getPrice());
             orderItems.add(orderItem);
         }
 
-        // Create and save the order (static payment: "PAID")
+        // Create and save the order
         Order order = new Order(userId, orderItems, finalAmount, "PAID", shippingAddress, new Date());
         Order savedOrder = orderRepository.save(order);
 
-        // Clear the cart items after order is placed
+        // Populate each OrderItem with full product data
+        savedOrder.getItems().forEach(item -> {
+            productRepository.findById(item.getProductId().toString())
+                    .ifPresent(item::setProductData);
+        });
+
+        // Clear the cart items after placing the order
         cart.setItems(new ArrayList<>());
         cartRepository.save(cart);
 
         return savedOrder;
     }
 
-    public List<Order> getOrdersByUser(String userId) {
-        return orderRepository.findByUserId(userId);
+    public List<Order> getOrdersByUser(ObjectId userId) {
+        List<Order> orders = orderRepository.findByUserId(userId);
+        // Optionally populate product data for each order item:
+        orders.forEach(order -> {
+            order.getItems().forEach(item -> {
+                productRepository.findById(item.getProductId().toString())
+                        .ifPresent(item::setProductData);
+            });
+        });
+        return orders;
     }
 }
