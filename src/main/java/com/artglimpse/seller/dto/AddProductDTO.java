@@ -1,10 +1,12 @@
 package com.artglimpse.seller.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AddProductDTO {
 
     private String name;
@@ -15,7 +17,7 @@ public class AddProductDTO {
     private String category;
     private Boolean discount;
     private Integer percentageDiscount;
-    
+  
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate validUntilDiscount;
     
@@ -25,7 +27,7 @@ public class AddProductDTO {
     
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate estimatedDelivery;
-    
+   
     private String materialsMade;
     private String tags;
 

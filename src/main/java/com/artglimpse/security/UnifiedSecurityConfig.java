@@ -1,30 +1,28 @@
 package com.artglimpse.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
-import com.artglimpse.authentication.service.CustomUserDetailsService;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 public class UnifiedSecurityConfig {
 
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -60,21 +58,18 @@ public class UnifiedSecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(customUserDetailsService)
-                .passwordEncoder(passwordEncoder())
-                .and().build();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors().and()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
+            .cors().and()
+            .csrf().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .authorizeHttpRequests(auth -> auth
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/api/user/**").permitAll()
@@ -90,23 +85,35 @@ public class UnifiedSecurityConfig {
                 .antMatchers(HttpMethod.POST, "/cart/**").permitAll()
                 .antMatchers(HttpMethod.PUT, "/cart/**").permitAll()
                 .antMatchers(HttpMethod.DELETE, "/cart/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/orders/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/orders/**").permitAll()
-                .antMatchers(HttpMethod.PUT, "/orders/**").permitAll()
-                .antMatchers(HttpMethod.DELETE, "/orders/**").permitAll()
+                // Allow GET requests to ordersList for all, but require authentication for PATCH (update)
+                .antMatchers(HttpMethod.GET, "/api/ordersList/**").permitAll()
+                .antMatchers(HttpMethod.PATCH, "/api/ordersList/**").permitAll()
+                // Other ordersList endpoints as needed:
+                .antMatchers(HttpMethod.POST, "/ordersList/**").permitAll()
+                .antMatchers(HttpMethod.PUT, "/ordersList/**").permitAll()
+                .antMatchers(HttpMethod.DELETE, "/ordersList/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/chat").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/chat").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/seller/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/stats").permitAll()  // Any logged-in user can view stats
-                // .antMatchers(HttpMethod.POST, "/api/stats").hasRole("SELLER")  // Only sellers can update stats
-                // .antMatchers(HttpMethod.PUT, "/api/stats").hasRole("SELLER")  // Only sellers can modify stats
+                .antMatchers(HttpMethod.GET, "/api/stats").permitAll()
                 .antMatchers("/seller/**").hasRole("SELLER")
                 .anyRequest().authenticated()
-                .and()
-                .httpBasic();
-
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
+            )
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(Arrays.asList("http://localhost:5174", "http://localhost:5173"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        config.setAllowCredentials(true);
+
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
     }
 }
