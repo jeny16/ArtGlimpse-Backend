@@ -17,13 +17,18 @@ import com.artglimpse.authentication.repository.UserRepository;
 import com.artglimpse.authentication.dto.JwtResponse;
 import com.artglimpse.authentication.dto.LoginRequest;
 import com.artglimpse.authentication.dto.SignupRequest;
-import com.artglimpse.authentication.model.User; // Common user model
+import com.artglimpse.authentication.model.User;
 import com.artglimpse.buyer.model.profile.BuyerProfile;
 import com.artglimpse.buyer.repository.profile.BuyerProfileRepository;
+import com.artglimpse.seller.model.SellerProfile;
+import com.artglimpse.seller.repository.SellerProfileRepository;
 import com.artglimpse.security.JwtTokenUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import io.jsonwebtoken.Claims;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -37,6 +42,9 @@ public class AuthController {
 
     @Autowired
     private BuyerProfileRepository buyerProfileRepository;
+
+    @Autowired
+    private SellerProfileRepository sellerProfileRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -73,26 +81,32 @@ public class AuthController {
         if (userRepository.existsByEmail(signupRequest.getEmail())) {
             return ResponseEntity.badRequest().body("Error: Email is already in use!");
         }
-        // Create the common user record without buyerProfile initially
+
         User newUser = new User(
                 signupRequest.getUsername(),
                 signupRequest.getEmail(),
                 passwordEncoder.encode(signupRequest.getPassword()),
                 role,
+                null,
                 null);
+
         newUser = userRepository.save(newUser);
 
-        // If the user is a buyer, create a corresponding BuyerProfile and update the
-        // User reference
         if ("ROLE_USER".equals(role)) {
             BuyerProfile buyerProfile = new BuyerProfile();
-            buyerProfile.setId(newUser.getId()); // link by using the same id
+            buyerProfile.setId(newUser.getId());
             buyerProfileRepository.save(buyerProfile);
             newUser.setBuyerProfile(buyerProfile);
-            userRepository.save(newUser);
         }
-        // For sellers or admins, create/update extended profiles as needed
 
+        if ("ROLE_SELLER".equals(role)) {
+            SellerProfile sellerProfile = new SellerProfile();
+            sellerProfile.setId(newUser.getId());
+            sellerProfileRepository.save(sellerProfile);
+            newUser.setSellerProfile(sellerProfile);
+        }
+
+        userRepository.save(newUser);
         return ResponseEntity.ok("User registered successfully with role: " + role);
     }
 
@@ -113,7 +127,36 @@ public class AuthController {
 
     @PostMapping("/seller/login")
     public ResponseEntity<?> authenticateSeller(@RequestBody LoginRequest loginRequest) {
-        return processAuthentication(loginRequest, "ROLE_SELLER");
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            User user = userRepository.findByEmail(loginRequest.getEmail())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + loginRequest.getEmail()));
+
+            if (!"ROLE_SELLER".equals(user.getRole())) {
+                return ResponseEntity.status(401).body("Error: Unauthorized - Incorrect role");
+            }
+
+            String jwt = jwtTokenUtil.generateToken(userDetails, user.getId());
+
+            SellerProfile sellerProfile = sellerProfileRepository.findById(user.getId()).orElse(null);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", jwt);
+            response.put("userId", user.getId());
+
+            if (sellerProfile != null) {
+                response.put("sellerId", sellerProfile.getId());
+            }
+
+            return ResponseEntity.ok(response);
+
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(401).body("Error: Invalid username or password");
+        }
     }
 
     @GetMapping("/validate")

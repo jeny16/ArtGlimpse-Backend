@@ -10,13 +10,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.annotation.PostConstruct;
 
 @Component
 public class JwtTokenUtil {
@@ -31,8 +29,7 @@ public class JwtTokenUtil {
 
     @PostConstruct
     public void init() {
-        String base64EncodedKey = Base64.getEncoder().encodeToString(jwtSecret.getBytes());
-        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(base64EncodedKey));
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
     public String getUsernameFromToken(String token) {
@@ -53,12 +50,16 @@ public class JwtTokenUtil {
 
     public String generateToken(UserDetails userDetails, String userId) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("role", userDetails.getAuthorities().stream()
+                .findFirst().orElseThrow(() -> new RuntimeException("User has no roles"))
+                .getAuthority()); // Store user role
         return doGenerateToken(claims, userId);
     }
 
     private String doGenerateToken(Map<String, Object> claims, String subject) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
+        
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)

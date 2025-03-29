@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import com.artglimpse.buyer.model.profile.BuyerProfile;
+import com.artglimpse.seller.model.SellerProfile;
 
 @Document(collection = "users")
 public class User {
@@ -12,23 +13,26 @@ public class User {
     private String username;
     private String email;
     private String password;
-    private String role; // e.g., ROLE_USER, ROLE_SELLER, ROLE_ADMIN
+    private String role;
 
     @DBRef(lazy = true)
-    private BuyerProfile buyerProfile; // Reference to the buyer profile (only for ROLE_USER)
+    private BuyerProfile buyerProfile;
+
+    @DBRef(lazy = true)
+    private SellerProfile sellerProfile;
 
     public User() {
     }
 
-    public User(String username, String email, String password, String role, BuyerProfile buyerProfile) {
+    public User(String username, String email, String password, String role, BuyerProfile buyerProfile, SellerProfile sellerProfile) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
         this.buyerProfile = buyerProfile;
+        this.sellerProfile = sellerProfile;
     }
 
-    // Getters and Setters
     public String getId() {
         return id;
     }
@@ -75,5 +79,13 @@ public class User {
 
     public void setBuyerProfile(BuyerProfile buyerProfile) {
         this.buyerProfile = buyerProfile;
+    }
+
+    public SellerProfile getSellerProfile() {
+        return sellerProfile;
+    }
+
+    public void setSellerProfile(SellerProfile sellerProfile) {
+        this.sellerProfile = sellerProfile;
     }
 }
