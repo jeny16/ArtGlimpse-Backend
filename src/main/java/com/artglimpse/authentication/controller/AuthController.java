@@ -23,6 +23,7 @@ import com.artglimpse.buyer.repository.profile.BuyerProfileRepository;
 import com.artglimpse.seller.model.SellerProfile;
 import com.artglimpse.seller.repository.SellerProfileRepository;
 import com.artglimpse.security.JwtTokenUtil;
+import org.bson.types.ObjectId;
 
 import javax.servlet.http.HttpServletRequest;
 import io.jsonwebtoken.Claims;
@@ -89,21 +90,22 @@ public class AuthController {
                 role,
                 null,
                 null);
-
         newUser = userRepository.save(newUser);
 
         if ("ROLE_USER".equals(role)) {
             BuyerProfile buyerProfile = new BuyerProfile();
             buyerProfile.setId(newUser.getId());
             buyerProfileRepository.save(buyerProfile);
-            newUser.setBuyerProfile(buyerProfile);
+            // Convert the stored buyerProfile id (a String) to ObjectId
+            newUser.setBuyerProfile(new ObjectId(buyerProfile.getId()));
         }
 
         if ("ROLE_SELLER".equals(role)) {
             SellerProfile sellerProfile = new SellerProfile();
             sellerProfile.setId(newUser.getId());
             sellerProfileRepository.save(sellerProfile);
-            newUser.setSellerProfile(sellerProfile);
+            // Convert the stored sellerProfile id (a String) to ObjectId
+            newUser.setSellerProfile(new ObjectId(sellerProfile.getId()));
         }
 
         userRepository.save(newUser);
@@ -134,7 +136,8 @@ public class AuthController {
 
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             User user = userRepository.findByEmail(loginRequest.getEmail())
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + loginRequest.getEmail()));
+                    .orElseThrow(() -> new UsernameNotFoundException(
+                            "User not found with email: " + loginRequest.getEmail()));
 
             if (!"ROLE_SELLER".equals(user.getRole())) {
                 return ResponseEntity.status(401).body("Error: Unauthorized - Incorrect role");
