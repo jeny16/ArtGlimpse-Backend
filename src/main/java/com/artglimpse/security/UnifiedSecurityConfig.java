@@ -1,39 +1,43 @@
 package com.artglimpse.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-
-import java.util.Arrays;
+import com.artglimpse.authentication.service.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
 public class UnifiedSecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
 
+    // JWT filter for validating tokens on incoming requests
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter();
     }
 
+    // Password encoder bean
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // In-memory user details manager (for testing purposes)
     @Bean
     public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
         UserDetails admin = User.withDefaultPasswordEncoder()
@@ -57,19 +61,27 @@ public class UnifiedSecurityConfig {
         return new InMemoryUserDetailsManager(admin, seller, user);
     }
 
+    // Configure AuthenticationManager using your custom user details service and
+    // password encoder.
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                .userDetailsService(customUserDetailsService)
+                .passwordEncoder(passwordEncoder())
+                .and().build();
     }
 
+    // Unified security filter chain configuration
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors().and()
-            .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .authorizeHttpRequests(auth -> auth
+                .cors().and()
+                .csrf().disable()
+                // Use stateless sessions since we're using JWT
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                // Define endpoint-specific security rules
+                .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/api/user/**").permitAll()
@@ -85,10 +97,13 @@ public class UnifiedSecurityConfig {
                 .antMatchers(HttpMethod.POST, "/cart/**").permitAll()
                 .antMatchers(HttpMethod.PUT, "/cart/**").permitAll()
                 .antMatchers(HttpMethod.DELETE, "/cart/**").permitAll()
-                // Allow GET requests to ordersList for all, but require authentication for PATCH (update)
+                .antMatchers(HttpMethod.GET, "/orders/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/orders/**").permitAll()
+                .antMatchers(HttpMethod.PUT, "/orders/**").permitAll()
+                .antMatchers(HttpMethod.DELETE, "/orders/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/ordersList/**").permitAll()
                 .antMatchers(HttpMethod.PATCH, "/api/ordersList/**").permitAll()
-                // Other ordersList endpoints as needed:
+                .antMatchers(HttpMethod.POST, "/api/ordersList/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/ordersList/**").permitAll()
                 .antMatchers(HttpMethod.PUT, "/ordersList/**").permitAll()
                 .antMatchers(HttpMethod.DELETE, "/ordersList/**").permitAll()
@@ -97,23 +112,16 @@ public class UnifiedSecurityConfig {
                 .antMatchers(HttpMethod.POST, "/api/seller/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/stats").permitAll()
                 .antMatchers("/seller/**").hasRole("SELLER")
+                // Any other request must be authenticated
                 .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .and()
+                // Optionally enable HTTP Basic authentication for testing or fallback
+                .httpBasic();
+
+        // Add the JWT filter before the UsernamePasswordAuthenticationFilter in the
+        // filter chain
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
-    }
-
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5174", "http://localhost:5173"));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        config.setAllowCredentials(true);
-
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
     }
 }

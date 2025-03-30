@@ -1,7 +1,7 @@
-package com.artglimpse.buyer.service.product;
+package com.artglimpse.product.service;
 
-import com.artglimpse.buyer.model.product.Product;
-import com.artglimpse.buyer.repository.product.ProductRepository;
+import com.artglimpse.product.model.Product;
+import com.artglimpse.product.repository.ProductRepository;
 import com.artglimpse.seller.model.Seller;
 import com.artglimpse.seller.repository.SellerRepository;
 

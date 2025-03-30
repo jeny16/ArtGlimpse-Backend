@@ -1,9 +1,9 @@
-package com.artglimpse.buyer.repository.product;
+package com.artglimpse.product.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import com.artglimpse.buyer.model.product.Product;
+import com.artglimpse.product.model.Product;
 
 import java.util.List;
 
