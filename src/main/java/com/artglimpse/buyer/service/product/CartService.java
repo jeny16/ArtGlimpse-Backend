@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import com.artglimpse.buyer.model.product.Cart;
 import com.artglimpse.buyer.model.product.CartItem;
 import com.artglimpse.buyer.repository.product.CartRepository;
-import com.artglimpse.buyer.repository.product.ProductRepository;
+import com.artglimpse.product.repository.ProductRepository;
 import com.artglimpse.buyer.repository.profile.BuyerProfileRepository;
 import org.bson.types.ObjectId;
 import java.util.Optional;

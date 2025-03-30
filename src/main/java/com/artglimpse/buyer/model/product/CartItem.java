@@ -2,6 +2,7 @@ package com.artglimpse.buyer.model.product;
 
 import org.bson.types.ObjectId;
 
+import com.artglimpse.product.model.Product;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 

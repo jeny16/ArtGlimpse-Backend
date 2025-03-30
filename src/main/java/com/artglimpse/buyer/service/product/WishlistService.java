@@ -1,10 +1,10 @@
 package com.artglimpse.buyer.service.product;
 
 import com.artglimpse.buyer.dto.product.WishlistResponse;
-import com.artglimpse.buyer.model.product.Product;
+import com.artglimpse.product.model.Product;
 import com.artglimpse.buyer.model.product.Wishlist;
 import com.artglimpse.buyer.model.profile.BuyerProfile;
-import com.artglimpse.buyer.repository.product.ProductRepository;
+import com.artglimpse.product.repository.ProductRepository;
 import com.artglimpse.buyer.repository.product.WishlistRepository;
 import com.artglimpse.buyer.repository.profile.BuyerProfileRepository;
 import org.bson.types.ObjectId;

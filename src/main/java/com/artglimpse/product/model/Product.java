@@ -1,4 +1,4 @@
-package com.artglimpse.buyer.model.product;
+package com.artglimpse.product.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
