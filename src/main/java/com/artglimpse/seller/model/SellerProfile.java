@@ -5,21 +5,25 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "sellerProfiles")
 public class SellerProfile {
+
     @Id
     private String id;
-    private String storeName;
+    private String name;
+    private String email;
     private String contactNumber;
     private String address;
 
-    public SellerProfile() {
-    }
+    public SellerProfile() {}
 
-    public SellerProfile(String id, String storeName, String contactNumber, String address) {
+    public SellerProfile(String id, String name, String email, String contactNumber, String address) {
         this.id = id;
-        this.storeName = storeName;
+        this.name = name;
+        this.email = email;
         this.contactNumber = contactNumber;
         this.address = address;
     }
+
+    // Getters and Setters
 
     public String getId() {
         return id;
@@ -29,12 +33,20 @@ public class SellerProfile {
         this.id = id;
     }
 
-    public String getStoreName() {
-        return storeName;
+    public String getName() {
+        return name;
     }
 
-    public void setStoreName(String storeName) {
-        this.storeName = storeName;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getContactNumber() {

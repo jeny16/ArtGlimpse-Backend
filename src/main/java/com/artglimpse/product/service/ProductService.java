@@ -2,10 +2,9 @@ package com.artglimpse.product.service;
 
 import com.artglimpse.product.model.Product;
 import com.artglimpse.product.repository.ProductRepository;
-import com.artglimpse.seller.model.Seller;
-import com.artglimpse.seller.repository.SellerRepository;
-
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.artglimpse.seller.repository.SellerRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -31,9 +30,11 @@ public class ProductService {
 
     // Create a new product with a seller reference
     public Product createProduct(Product product, String sellerId) {
-        Seller seller = sellerRepository.findById(sellerId)
-                .orElseThrow(() -> new RuntimeException("Seller not found with id " + sellerId));
-        product.setSeller(seller);
+        if (!sellerRepository.existsById(sellerId)) {
+            throw new RuntimeException("Seller not found with id " + sellerId);
+        }
+        // Convert sellerId to ObjectId and set it
+        product.setSeller(new ObjectId(sellerId));
         return productRepository.save(product);
     }
 
@@ -55,9 +56,10 @@ public class ProductService {
         product.setPercentage_Discount(productDetails.getPercentage_Discount());
 
         if (sellerId != null && !sellerId.isEmpty()) {
-            Seller seller = sellerRepository.findById(sellerId)
-                    .orElseThrow(() -> new RuntimeException("Seller not found with id " + sellerId));
-            product.setSeller(seller);
+            if (!sellerRepository.existsById(sellerId)) {
+                throw new RuntimeException("Seller not found with id " + sellerId);
+            }
+            product.setSeller(new ObjectId(sellerId));
         }
 
         product.setProcessing_Time(productDetails.getProcessing_Time());

@@ -1,11 +1,8 @@
 package com.artglimpse.product.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import com.artglimpse.seller.model.Seller;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -24,11 +21,7 @@ public class Product {
     private boolean discount;
     private LocalDate valid_Until_Discount;
     private int percentage_Discount;
-
-    // Reference to the Seller document
-    @DBRef
-    private Seller seller;
-
+    private ObjectId seller;
     private String processing_Time;
     private String shipping_Time;
     private double shipping_Cost;
@@ -37,13 +30,12 @@ public class Product {
     private List<String> materials_Made;
     private List<String> tags;
 
-    // Constructors
     public Product() {
     }
 
     public Product(String categories, String name, String description, double price, String currency, int stock,
             List<String> images, boolean discount, LocalDate valid_Until_Discount, int percentage_Discount,
-            Seller seller, String processing_Time, String shipping_Time, double shipping_Cost,
+            ObjectId seller, String processing_Time, String shipping_Time, double shipping_Cost,
             String estimated_Delivery, List<String> countries_Available, List<String> materials_Made,
             List<String> tags) {
         this.categories = categories;
@@ -156,11 +148,11 @@ public class Product {
         this.percentage_Discount = percentage_Discount;
     }
 
-    public Seller getSeller() {
+    public ObjectId getSeller() {
         return seller;
     }
 
-    public void setSeller(Seller seller) {
+    public void setSeller(ObjectId seller) {
         this.seller = seller;
     }
 

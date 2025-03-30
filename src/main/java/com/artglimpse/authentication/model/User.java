@@ -1,10 +1,8 @@
 package com.artglimpse.authentication.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import com.artglimpse.buyer.model.profile.BuyerProfile;
-import com.artglimpse.seller.model.SellerProfile;
 
 @Document(collection = "users")
 public class User {
@@ -14,17 +12,14 @@ public class User {
     private String email;
     private String password;
     private String role;
-
-    @DBRef(lazy = true)
-    private BuyerProfile buyerProfile;
-
-    @DBRef(lazy = true)
-    private SellerProfile sellerProfile;
+    private ObjectId buyerProfile;
+    private ObjectId sellerProfile;
 
     public User() {
     }
 
-    public User(String username, String email, String password, String role, BuyerProfile buyerProfile, SellerProfile sellerProfile) {
+    public User(String username, String email, String password, String role, ObjectId buyerProfile,
+            ObjectId sellerProfile) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -33,6 +28,7 @@ public class User {
         this.sellerProfile = sellerProfile;
     }
 
+    // Getters and setters
     public String getId() {
         return id;
     }
@@ -73,19 +69,19 @@ public class User {
         this.role = role;
     }
 
-    public BuyerProfile getBuyerProfile() {
+    public ObjectId getBuyerProfile() {
         return buyerProfile;
     }
 
-    public void setBuyerProfile(BuyerProfile buyerProfile) {
+    public void setBuyerProfile(ObjectId buyerProfile) {
         this.buyerProfile = buyerProfile;
     }
 
-    public SellerProfile getSellerProfile() {
+    public ObjectId getSellerProfile() {
         return sellerProfile;
     }
 
-    public void setSellerProfile(SellerProfile sellerProfile) {
+    public void setSellerProfile(ObjectId sellerProfile) {
         this.sellerProfile = sellerProfile;
     }
 }

@@ -52,11 +52,8 @@ public class OrderService {
             double itemShipping = item.getShippingCost() != null ? item.getShippingCost() : 0.0;
             shippingCost = Math.max(shippingCost, itemShipping);
 
-            // Set sellerId from the product's seller reference (assumes a single seller per
-            // order)
             if (sellerId == null && item.getProductData() != null && item.getProductData().getSeller() != null) {
-                // Convert seller's id (assumed to be a String) to ObjectId
-                sellerId = new ObjectId(item.getProductData().getSeller().getId());
+                sellerId = item.getProductData().getSeller();
             }
             OrderItem orderItem = new OrderItem(item.getProductId(), item.getQuantity(),
                     item.getProductData().getPrice());

@@ -111,6 +111,10 @@ public class UnifiedSecurityConfig {
                 .antMatchers(HttpMethod.POST, "/api/chat").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/seller/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/stats").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/seller/profile/**").permitAll()
+                .antMatchers(HttpMethod.PUT, "/api/seller/profile/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/seller/store/**").permitAll()
+                .antMatchers(HttpMethod.PUT, "/api/seller/store/**").permitAll()
                 .antMatchers("/seller/**").hasRole("SELLER")
                 // Any other request must be authenticated
                 .anyRequest().authenticated()
