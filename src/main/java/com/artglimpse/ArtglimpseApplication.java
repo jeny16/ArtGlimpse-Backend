@@ -11,5 +11,5 @@ public class ArtglimpseApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ArtglimpseApplication.class, args);
 	}
-
+ 
 }

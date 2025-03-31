@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface OrderRepository extends MongoRepository<Order, ObjectId> {
     List<Order> findByUserId(ObjectId userId);
-    Page<Order> findBySellerIdOrderByCreatedAtDesc(String sellerId, Pageable pageable);
+    Page<Order> findBySellerIdOrderByCreatedAtDesc(ObjectId sellerId, Pageable pageable);
+    // Page<Order> findBySellerIdOrderByCreatedAtDesc(String sellerId, Pageable pageable);
 }
