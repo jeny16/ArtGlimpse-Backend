@@ -91,6 +91,7 @@ import com.artglimpse.seller.dto.SellerResponse;
 import com.artglimpse.seller.model.SellerProfile;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.artglimpse.seller.repository.SellerRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
