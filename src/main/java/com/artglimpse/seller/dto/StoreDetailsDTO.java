@@ -1,52 +1,34 @@
-package com.artglimpse.seller.model;
+package com.artglimpse.seller.dto;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.LocalDate;
 import java.util.List;
 
-@Document(collection = "storeDetails")
-public class StoreDetails {
-    @Id
-    private String sellerId;
+public class StoreDetailsDTO {
     private String storeName;
     private String ownerName;
     private String gstNumber;
     private String aadharNumber;
     private String panNumber;
-
-    // New detailed address fields (no "name" field)
+    // New address fields (no name field)
     private String addressStreet;
     private String addressCity;
     private String addressState;
     private String addressZip;
     private String addressCountry;
-
     private String description;
     private String storeLogoUrl;
     private String storeBannerUrl;
-    private List<String> categories;
+    private List<String> categories; // Now a list of strings
     private String website;
-    private LocalDate establishedDate; // Stored as LocalDate
+    private String establishedDate; // Expected in "dd-MM-yyyy" format
     private String returnPolicy;
-
     // New store contact fields
     private String storeMobile;
     private String storeEmail;
 
-    public StoreDetails() {
+    public StoreDetailsDTO() {
     }
 
-    // Getters and Setters
-
-    public String getSellerId() {
-        return sellerId;
-    }
-
-    public void setSellerId(String sellerId) {
-        this.sellerId = sellerId;
-    }
+    // Getters and setters for all fields
 
     public String getStoreName() {
         return storeName;
@@ -88,7 +70,6 @@ public class StoreDetails {
         this.panNumber = panNumber;
     }
 
-    // Address details
     public String getAddressStreet() {
         return addressStreet;
     }
@@ -169,11 +150,11 @@ public class StoreDetails {
         this.website = website;
     }
 
-    public LocalDate getEstablishedDate() {
+    public String getEstablishedDate() {
         return establishedDate;
     }
 
-    public void setEstablishedDate(LocalDate establishedDate) {
+    public void setEstablishedDate(String establishedDate) {
         this.establishedDate = establishedDate;
     }
 
@@ -185,7 +166,6 @@ public class StoreDetails {
         this.returnPolicy = returnPolicy;
     }
 
-    // Store contact details
     public String getStoreMobile() {
         return storeMobile;
     }

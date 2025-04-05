@@ -3,10 +3,9 @@ package com.artglimpse.seller.service;
 import com.artglimpse.authentication.model.User;
 import com.artglimpse.authentication.repository.UserRepository;
 import com.artglimpse.seller.model.SellerProfile;
-import com.artglimpse.seller.model.StoreDetails;
 import com.artglimpse.seller.repository.SellerProfileRepository;
-import com.artglimpse.seller.repository.StoreDetailsRepository;
 import com.artglimpse.seller.dto.SellerProfileDTO;
+import com.artglimpse.seller.dto.SellerProfileUpdateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,49 +18,43 @@ public class SellerProfileService {
     private SellerProfileRepository sellerProfileRepo;
 
     @Autowired
-    private StoreDetailsRepository storeDetailsRepo;
-
-    @Autowired
     private UserRepository userRepository;
 
     public SellerProfileDTO getSellerProfile(String userId) {
         Optional<User> userOpt = userRepository.findById(userId);
         Optional<SellerProfile> profileOpt = sellerProfileRepo.findById(userId);
-        System.out.println("Fetching profile for userId: " + userId);
-        
+        System.out.println("Fetching seller profile for userId: " + userId);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             SellerProfile profile = profileOpt.orElse(new SellerProfile());
-
+            // Use profile name if exists; otherwise fallback to user's username
+            String name = (profile.getName() != null && !profile.getName().isEmpty()) ? profile.getName()
+                    : user.getUsername();
             return new SellerProfileDTO(
-                user.getUsername(),
-                user.getEmail(),
-                profile.getContactNumber(),
-                profile.getAddress()
-            );
+                    name,
+                    user.getEmail(),
+                    profile.getContactNumber(),
+                    profile.getStoreName());
         }
         return null;
     }
 
-    public SellerProfile updateSellerProfile(String userId, SellerProfile profileData) {
-        profileData.setId(userId); // Ensure ID is set
-        return sellerProfileRepo.save(profileData);
+    public SellerProfile updateSellerProfile(String userId, SellerProfileUpdateRequest updateRequest) {
+        SellerProfile profile = sellerProfileRepo.findById(userId).orElse(new SellerProfile());
+        profile.setId(userId);
+        profile.setName(updateRequest.getName());
+        profile.setEmail(updateRequest.getEmail());
+        profile.setContactNumber(updateRequest.getContactNumber());
+        profile.setStoreName(updateRequest.getStoreName());
+        return sellerProfileRepo.save(profile);
     }
 
     public boolean existsById(String userId) {
         return sellerProfileRepo.existsById(userId);
     }
 
-    public void deleteSellerProfile(String userId) {
+    public void deleteSellerAndRelatedData(String userId) {
         sellerProfileRepo.deleteById(userId);
-        // Optional: delete related store details, etc.
-    }
-
-    public Optional<StoreDetails> getStoreDetails(String sellerId) {
-        return storeDetailsRepo.findById(sellerId);
-    }
-
-    public StoreDetails updateStoreDetails(StoreDetails updatedStore) {
-        return storeDetailsRepo.save(updatedStore);
+        userRepository.deleteById(userId);
     }
 }
