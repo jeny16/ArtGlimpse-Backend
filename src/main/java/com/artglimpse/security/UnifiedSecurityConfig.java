@@ -1,5 +1,6 @@
 package com.artglimpse.security;
 
+import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import com.artglimpse.authentication.service.CustomUserDetailsService;
 
 @Configuration
@@ -61,8 +66,7 @@ public class UnifiedSecurityConfig {
         return new InMemoryUserDetailsManager(admin, seller, user);
     }
 
-    // Configure AuthenticationManager using your custom user details service and
-    // password encoder.
+    // Configure AuthenticationManager using your custom user details service and password encoder.
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
@@ -71,11 +75,30 @@ public class UnifiedSecurityConfig {
                 .and().build();
     }
 
+    // Global CORS configuration
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // Allow your client origins
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5174", "http://localhost:5173"));
+        // Allow necessary HTTP methods
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        // Allow all headers (or specify only the ones you need)
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        // Allow credentials if needed
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // Apply this configuration to all endpoints
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     // Unified security filter chain configuration
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors().and()
+                .cors() // Use the global CORS configuration defined above
+                .and()
                 .csrf().disable()
                 // Use stateless sessions since we're using JWT
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -122,8 +145,7 @@ public class UnifiedSecurityConfig {
                 // Optionally enable HTTP Basic authentication for testing or fallback
                 .httpBasic();
 
-        // Add the JWT filter before the UsernamePasswordAuthenticationFilter in the
-        // filter chain
+        // Add the JWT filter before the UsernamePasswordAuthenticationFilter in the filter chain
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

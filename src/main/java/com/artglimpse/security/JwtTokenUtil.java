@@ -9,7 +9,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
+import com.artglimpse.security.CustomUserDetails;
 import javax.annotation.PostConstruct;
 import java.security.Key;
 import java.util.Date;
@@ -70,8 +70,13 @@ public class JwtTokenUtil {
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        final String userIdFromToken = getUsernameFromToken(token);
+        // Cast to CustomUserDetails to access the id field.
+        if (!(userDetails instanceof CustomUserDetails)) {
+            return false;
+        }
+        CustomUserDetails customUser = (CustomUserDetails) userDetails;
+        return (userIdFromToken.equals(customUser.getId()) && !isTokenExpired(token));
     }
 
     private boolean isTokenExpired(String token) {
