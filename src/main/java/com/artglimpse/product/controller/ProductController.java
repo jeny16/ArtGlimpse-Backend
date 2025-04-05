@@ -71,11 +71,15 @@ package com.artglimpse.product.controller;
 import com.artglimpse.product.dto.ProductResponse;
 import com.artglimpse.product.model.Product;
 import com.artglimpse.product.service.ProductService;
+
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -110,23 +114,15 @@ public class ProductController {
         return response.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    // Seller-only endpoint: Create a new product (the sellerId parameter is
-    // required)
-    @PostMapping
-    @PreAuthorize("hasRole('ROLE_SELLER')")
-    public ResponseEntity<Product> createProduct(@RequestBody Product product, @RequestParam String sellerId) {
-        Product created = productService.createProduct(product, sellerId);
-        return ResponseEntity.status(201).body(created);
-    }
-
     // Seller-only endpoint: Update an existing product
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_SELLER')")
-    public ResponseEntity<Product> updateProduct(@PathVariable String id,
-            @RequestBody Product product,
+    public ResponseEntity<Product> updateProduct(
+            @PathVariable String id,
+            @RequestBody Map<String, Object> updates,
             @RequestParam(required = false) String sellerId) {
-        Product updated = productService.updateProduct(id, product, sellerId);
-        return ResponseEntity.ok(updated);
+        Product updatedProduct = productService.updateProduct(id, updates, sellerId);
+        return ResponseEntity.ok(updatedProduct);
     }
 
     // Seller-only endpoint: Delete a product
@@ -136,4 +132,22 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
+
+    // Endpoint: Get products by seller ID
+    @GetMapping("/seller")
+    @PreAuthorize("hasRole('ROLE_SELLER')")
+    public ResponseEntity<?> getProductsBySeller(@RequestParam String sellerId) {
+        if (!ObjectId.isValid(sellerId)) {
+            return ResponseEntity.badRequest().body("Invalid sellerId format.");
+        }
+        ObjectId sellerObjectId = new ObjectId(sellerId);
+        List<Product> products = productService.getProductsBySeller(sellerObjectId);
+        List<ProductResponse> productResponses = products.stream()
+                .map(product -> productService.getProductWithSellerDetails(product.getId())
+                        .orElse(new ProductResponse(product, null)))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(productResponses);
+    }
+    
+    
 }
