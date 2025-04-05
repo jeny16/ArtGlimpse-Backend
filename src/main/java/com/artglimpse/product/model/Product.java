@@ -21,6 +21,7 @@ public class Product {
     private boolean discount;
     private LocalDate valid_Until_Discount;
     private int percentage_Discount;
+    // Changed seller from ObjectId to String
     private ObjectId seller;
     private String processing_Time;
     private String shipping_Time;
@@ -59,156 +60,155 @@ public class Product {
     }
 
     // Getters and Setters
-
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
-        this.id = id;
+       this.id = id;
     }
 
     public String getCategories() {
-        return categories;
+       return categories;
     }
 
     public void setCategories(String categories) {
-        this.categories = categories;
+       this.categories = categories;
     }
 
     public String getName() {
-        return name;
+       return name;
     }
 
     public void setName(String name) {
-        this.name = name;
+       this.name = name;
     }
 
     public String getDescription() {
-        return description;
+       return description;
     }
 
     public void setDescription(String description) {
-        this.description = description;
+       this.description = description;
     }
 
     public double getPrice() {
-        return price;
+       return price;
     }
 
     public void setPrice(double price) {
-        this.price = price;
+       this.price = price;
     }
 
     public String getCurrency() {
-        return currency;
+       return currency;
     }
 
     public void setCurrency(String currency) {
-        this.currency = currency;
+       this.currency = currency;
     }
 
     public int getStock() {
-        return stock;
+       return stock;
     }
 
     public void setStock(int stock) {
-        this.stock = stock;
+       this.stock = stock;
     }
 
     public List<String> getImages() {
-        return images;
+       return images;
     }
 
     public void setImages(List<String> images) {
-        this.images = images;
+       this.images = images;
     }
 
     public boolean isDiscount() {
-        return discount;
+       return discount;
     }
 
     public void setDiscount(boolean discount) {
-        this.discount = discount;
+       this.discount = discount;
     }
 
     public LocalDate getValid_Until_Discount() {
-        return valid_Until_Discount;
+       return valid_Until_Discount;
     }
 
     public void setValid_Until_Discount(LocalDate valid_Until_Discount) {
-        this.valid_Until_Discount = valid_Until_Discount;
+       this.valid_Until_Discount = valid_Until_Discount;
     }
 
     public int getPercentage_Discount() {
-        return percentage_Discount;
+       return percentage_Discount;
     }
 
     public void setPercentage_Discount(int percentage_Discount) {
-        this.percentage_Discount = percentage_Discount;
+       this.percentage_Discount = percentage_Discount;
     }
 
     public ObjectId getSeller() {
-        return seller;
+       return seller;
     }
 
     public void setSeller(ObjectId seller) {
-        this.seller = seller;
+       this.seller = seller;
     }
 
     public String getProcessing_Time() {
-        return processing_Time;
+       return processing_Time;
     }
 
     public void setProcessing_Time(String processing_Time) {
-        this.processing_Time = processing_Time;
+       this.processing_Time = processing_Time;
     }
 
     public String getShipping_Time() {
-        return shipping_Time;
+       return shipping_Time;
     }
 
     public void setShipping_Time(String shipping_Time) {
-        this.shipping_Time = shipping_Time;
+       this.shipping_Time = shipping_Time;
     }
 
     public double getShipping_Cost() {
-        return shipping_Cost;
+       return shipping_Cost;
     }
 
     public void setShipping_Cost(double shipping_Cost) {
-        this.shipping_Cost = shipping_Cost;
+       this.shipping_Cost = shipping_Cost;
     }
 
     public String getEstimated_Delivery() {
-        return estimated_Delivery;
+       return estimated_Delivery;
     }
 
     public void setEstimated_Delivery(String estimated_Delivery) {
-        this.estimated_Delivery = estimated_Delivery;
+       this.estimated_Delivery = estimated_Delivery;
     }
 
     public List<String> getCountries_Available() {
-        return countries_Available;
+       return countries_Available;
     }
 
     public void setCountries_Available(List<String> countries_Available) {
-        this.countries_Available = countries_Available;
+       this.countries_Available = countries_Available;
     }
 
     public List<String> getMaterials_Made() {
-        return materials_Made;
+       return materials_Made;
     }
 
     public void setMaterials_Made(List<String> materials_Made) {
-        this.materials_Made = materials_Made;
+       this.materials_Made = materials_Made;
     }
 
     public List<String> getTags() {
-        return tags;
+       return tags;
     }
 
     public void setTags(List<String> tags) {
-        this.tags = tags;
+       this.tags = tags;
     }
 }
