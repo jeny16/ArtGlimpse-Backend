@@ -27,9 +27,14 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    // Updated endpoint: Get all products with full seller details
     @GetMapping
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
+    public List<ProductResponse> getAllProducts() {
+        List<Product> products = productService.getAllProducts();
+        return products.stream()
+                .map(product -> productService.getProductWithSellerDetails(product.getId())
+                        .orElse(new ProductResponse(product, null)))
+                .collect(Collectors.toList());
     }
 
     // Public endpoint: Get basic product details by ID
