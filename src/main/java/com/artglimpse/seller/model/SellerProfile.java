@@ -11,20 +11,20 @@ public class SellerProfile {
     private String name;
     private String email;
     private String contactNumber;
-    private String address;
+    private String storeName;
 
-    public SellerProfile() {}
+    public SellerProfile() {
+    }
 
-    public SellerProfile(String id, String name, String email, String contactNumber, String address) {
+    public SellerProfile(String id, String name, String email, String contactNumber, String storeName) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.contactNumber = contactNumber;
-        this.address = address;
+        this.storeName = storeName;
     }
 
     // Getters and Setters
-
     public String getId() {
         return id;
     }
@@ -57,11 +57,11 @@ public class SellerProfile {
         this.contactNumber = contactNumber;
     }
 
-    public String getAddress() {
-        return address;
+    public String getStoreName() {
+        return storeName;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
     }
 }

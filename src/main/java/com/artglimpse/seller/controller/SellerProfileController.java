@@ -1,6 +1,7 @@
 package com.artglimpse.seller.controller;
 
 import com.artglimpse.seller.dto.SellerProfileDTO;
+import com.artglimpse.seller.dto.SellerProfileUpdateRequest;
 import com.artglimpse.seller.model.SellerProfile;
 import com.artglimpse.seller.service.SellerProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +25,18 @@ public class SellerProfileController {
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<SellerProfile> updateProfile(@RequestParam String userId, @RequestBody SellerProfile updatedProfile) {
-        SellerProfile savedProfile = sellerProfileService.updateSellerProfile(userId, updatedProfile);
+    public ResponseEntity<SellerProfile> updateProfile(@RequestParam String userId,
+            @RequestBody SellerProfileUpdateRequest updateRequest) {
+        SellerProfile savedProfile = sellerProfileService.updateSellerProfile(userId, updateRequest);
         return ResponseEntity.ok(savedProfile);
     }
 
     @DeleteMapping("/profile")
-    public ResponseEntity<Void> deleteProfile(@RequestParam String userId) {
-        sellerProfileService.deleteSellerProfile(userId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteSellerProfile(@RequestParam String userId) {
+        if (!sellerProfileService.existsById(userId)) {
+            return ResponseEntity.status(404).body("Seller not found");
+        }
+        sellerProfileService.deleteSellerAndRelatedData(userId);
+        return ResponseEntity.ok("Seller and related data deleted successfully");
     }
 }

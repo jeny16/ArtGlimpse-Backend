@@ -4,24 +4,25 @@ public class SellerProfileDTO {
     private String name;
     private String email;
     private String contactNumber;
-    private String address;
+    private String storeName;
 
     public SellerProfileDTO() {
     }
 
-    public SellerProfileDTO(String name, String email, String contactNumber, String address) {
-        this.name = name != null ? name : "Not Provided";
-        this.email = email != null ? email : "Not Provided";
-        this.contactNumber = contactNumber != null ? contactNumber : "Not Provided";
-        this.address = address != null ? address : "Not Provided";
+    public SellerProfileDTO(String name, String email, String contactNumber, String storeName) {
+        this.name = name != null ? name : "NA";
+        this.email = email != null ? email : "NA";
+        this.contactNumber = contactNumber != null ? contactNumber : "NA";
+        this.storeName = storeName != null ? storeName : "NA";
     }
 
+    // Getters and Setters
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
-        this.name = name != null ? name : "Not Provided";
+        this.name = name != null ? name : "NA";
     }
 
     public String getEmail() {
@@ -29,7 +30,7 @@ public class SellerProfileDTO {
     }
 
     public void setEmail(String email) {
-        this.email = email != null ? email : "Not Provided";
+        this.email = email != null ? email : "NA";
     }
 
     public String getContactNumber() {
@@ -37,24 +38,14 @@ public class SellerProfileDTO {
     }
 
     public void setContactNumber(String contactNumber) {
-        this.contactNumber = contactNumber != null ? contactNumber : "Not Provided";
+        this.contactNumber = contactNumber != null ? contactNumber : "NA";
     }
 
-    public String getAddress() {
-        return address;
+    public String getStoreName() {
+        return storeName;
     }
 
-    public void setAddress(String address) {
-        this.address = address != null ? address : "Not Provided";
-    }
-
-    @Override
-    public String toString() {
-        return "SellerProfileDTO{" +
-                "name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", contactNumber='" + contactNumber + '\'' +
-                ", address='" + address + '\'' +
-                '}';
+    public void setStoreName(String storeName) {
+        this.storeName = storeName != null ? storeName : "NA";
     }
 }

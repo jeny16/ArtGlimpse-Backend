@@ -18,7 +18,8 @@ public class SellerResponse {
         this.sellerProfile = sellerProfile;
     }
 
-    // Getters and setters
+    // Getters and Setters
+
     public String getId() {
         return id;
     }
