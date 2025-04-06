@@ -46,45 +46,43 @@ public class ProductController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-@PreAuthorize("hasRole('ROLE_SELLER')")
-public ResponseEntity<Product> createProduct(
-        @RequestParam("name") String name,
-        @RequestParam("description") String description,
-        @RequestParam("price") double price,
-        @RequestParam("stock") int stock,
-        @RequestParam("category") String category,
-        @RequestParam("discount") boolean discount,
-        @RequestParam(value = "percentage_Discount", required = false) int percentageDiscount,
-        @RequestParam("materials_Made") List<String> materialsMade,
-        @RequestParam("tags") List<String> tags,
-        @RequestParam("sellerId") String sellerId,
-        @RequestParam("images") List<String> imageIds // ✅ Image IDs from Appwrite
-) {
-    try {
-        Product product = new Product();
-        product.setName(name);
-        product.setDescription(description);
-        product.setPrice(price);
-        product.setStock(stock);
-        product.setCategories(category);
-        product.setDiscount(discount);
-        product.setPercentage_Discount(percentageDiscount);
-        product.setMaterials_Made(materialsMade);
-        product.setTags(tags);
-        product.setImages(imageIds); // ✅ save Appwrite image IDs
+    @PreAuthorize("hasRole('ROLE_SELLER')")
+    public ResponseEntity<Product> createProduct(
+            @RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam("price") double price,
+            @RequestParam("stock") int stock,
+            @RequestParam("category") String category,
+            @RequestParam("discount") boolean discount,
+            @RequestParam(value = "percentage_Discount", required = false) Integer percentageDiscount,
+            @RequestParam("materials_Made") List<String> materialsMade,
+            @RequestParam("tags") List<String> tags,
+            @RequestParam("sellerId") String sellerId,
+            @RequestParam("images") List<String> imageIds // ✅ Image IDs from Appwrite
+    ) {
+        try {
+            Product product = new Product();
+            product.setName(name);
+            product.setDescription(description);
+            product.setPrice(price);
+            product.setStock(stock);
+            product.setCategories(category);
+            product.setDiscount(discount);
+            product.setPercentage_Discount(percentageDiscount != null ? percentageDiscount : 0);
+            product.setMaterials_Made(materialsMade);
+            product.setTags(tags);
+            product.setImages(imageIds); // ✅ save Appwrite image IDs
 
-        // 💰 Set default currency as INR
-        product.setCurrency("INR");
+            // 💰 Set default currency as INR
+            product.setCurrency("INR");
 
-        Product createdProduct = productService.createProduct(product, sellerId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
-    } catch (Exception e) {
-        e.printStackTrace(); // 💡 helpful during debugging
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            Product createdProduct = productService.createProduct(product, sellerId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+        } catch (Exception e) {
+            e.printStackTrace(); // 💡 helpful during debugging
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
-}
-
-
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_SELLER')")
