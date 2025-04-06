@@ -6,7 +6,12 @@
 // import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.http.ResponseEntity;
 // import org.springframework.web.bind.annotation.*;
+
+// import com.artglimpse.product.model.Product;
+// import com.artglimpse.product.service.ProductService;
+
 // import org.springframework.security.access.prepost.PreAuthorize;
+
 // import java.util.List;
 // import java.util.Optional;
 
@@ -28,14 +33,6 @@
 //     public ResponseEntity<Product> getProductById(@PathVariable String id) {
 //         Optional<Product> productOpt = productService.getProductById(id);
 //         return productOpt.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-//     }
-
-//     // New endpoint: Get detailed product info including full seller details using
-//     // DTO
-//     @GetMapping("/{id}/details")
-//     public ResponseEntity<ProductResponse> getProductDetails(@PathVariable String id) {
-//         Optional<ProductResponse> response = productService.getProductWithSellerDetails(id);
-//         return response.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
 //     }
 
 //     // Seller-only endpoint: Create a new product (the sellerId parameter is

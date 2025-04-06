@@ -68,6 +68,8 @@ public class UnifiedSecurityConfig {
 
     // Configure AuthenticationManager using your custom user details service and
     // password encoder.
+    // Configure AuthenticationManager using your custom user details service and
+    // password encoder.
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
