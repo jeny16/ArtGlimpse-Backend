@@ -151,8 +151,6 @@ public class UnifiedSecurityConfig {
                 // Optionally enable HTTP Basic authentication for testing or fallback
                 .httpBasic();
 
-        // Add the JWT filter before the UsernamePasswordAuthenticationFilter in the
-        // filter chain
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
