@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -59,7 +60,31 @@ public class ProductService {
             Field field = ReflectionUtils.findField(Product.class, key);
             if (field != null) {
                 field.setAccessible(true);
-                ReflectionUtils.setField(field, product, value);
+                // Convert valid_Until_Discount if needed
+                if ("valid_Until_Discount".equals(key)) {
+                    if (value instanceof String && !((String) value).isEmpty()) {
+                        LocalDate date = LocalDate.parse((String) value);
+                        ReflectionUtils.setField(field, product, date);
+                    }
+                }
+                // Validate numeric fields to ensure they are not negative.
+                else if ("price".equals(key) || "stock".equals(key)
+                        || "percentage_Discount".equals(key) || "shipping_Cost".equals(key)) {
+                    double num = Double.parseDouble(value.toString());
+                    if (num < 0) {
+                        throw new IllegalArgumentException(key + " cannot be negative");
+                    }
+                    // For integer fields (stock, percentage_Discount) convert accordingly.
+                    if ("stock".equals(key) || "percentage_Discount".equals(key)) {
+                        ReflectionUtils.setField(field, product, (int) num);
+                    } else {
+                        ReflectionUtils.setField(field, product, num);
+                    }
+                }
+                // For category update, if key is "categories" then use that.
+                else {
+                    ReflectionUtils.setField(field, product, value);
+                }
             }
         });
 
