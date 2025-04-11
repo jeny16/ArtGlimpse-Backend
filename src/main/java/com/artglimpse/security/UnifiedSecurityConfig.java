@@ -67,7 +67,8 @@ public class UnifiedSecurityConfig {
         return new InMemoryUserDetailsManager(admin, seller, user);
     }
 
-    // Configure AuthenticationManager using your custom user details service and password encoder.
+    // Configure AuthenticationManager using your custom user details service and
+    // password encoder.
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
@@ -127,6 +128,10 @@ public class UnifiedSecurityConfig {
                 .antMatchers(HttpMethod.POST, "/orders/**").permitAll()
                 .antMatchers(HttpMethod.PUT, "/orders/**").permitAll()
                 .antMatchers(HttpMethod.DELETE, "/orders/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/payment/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/payment/**").permitAll()
+                .antMatchers(HttpMethod.PUT, "/api/payment/**").permitAll()
+                .antMatchers(HttpMethod.DELETE, "/api/payment/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/ordersList/**").permitAll()
                 .antMatchers(HttpMethod.PATCH, "/api/ordersList/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/ordersList/**").permitAll()
@@ -148,7 +153,8 @@ public class UnifiedSecurityConfig {
                 // Optionally enable HTTP Basic authentication for testing or fallback
                 .httpBasic();
 
-        // Add the JWT filter before the UsernamePasswordAuthenticationFilter in the filter chain
+        // Add the JWT filter before the UsernamePasswordAuthenticationFilter in the
+        // filter chain
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
