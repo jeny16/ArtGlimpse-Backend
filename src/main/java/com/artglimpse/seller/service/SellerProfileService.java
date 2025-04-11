@@ -30,9 +30,12 @@ public class SellerProfileService {
             // Use profile name if exists; otherwise fallback to user's username
             String name = (profile.getName() != null && !profile.getName().isEmpty()) ? profile.getName()
                     : user.getUsername();
+            String email = (profile.getEmail() != null && !profile.getEmail().isEmpty())
+                    ? profile.getEmail()
+                    : user.getEmail();
             return new SellerProfileDTO(
                     name,
-                    user.getEmail(),
+                    email,
                     profile.getContactNumber(),
                     profile.getStoreName());
         }
