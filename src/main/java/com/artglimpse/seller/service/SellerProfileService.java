@@ -27,8 +27,9 @@ public class SellerProfileService {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             SellerProfile profile = profileOpt.orElse(new SellerProfile());
-            // Use profile name if exists; otherwise fallback to user's username
-            String name = (profile.getName() != null && !profile.getName().isEmpty()) ? profile.getName()
+
+            String name = (profile.getName() != null && !profile.getName().isEmpty())
+                    ? profile.getName()
                     : user.getUsername();
             String email = (profile.getEmail() != null && !profile.getEmail().isEmpty())
                     ? profile.getEmail()
@@ -42,14 +43,29 @@ public class SellerProfileService {
         return null;
     }
 
-    public SellerProfile updateSellerProfile(String userId, SellerProfileUpdateRequest updateRequest) {
+    public SellerProfileDTO updateSellerProfile(String userId, SellerProfileUpdateRequest updateRequest) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        if (updateRequest.getName() != null && !updateRequest.getName().isEmpty()) {
+            user.setUsername(updateRequest.getName());
+        }
+        if (updateRequest.getEmail() != null && !updateRequest.getEmail().isEmpty()) {
+            user.setEmail(updateRequest.getEmail());
+        }
+        userRepository.save(user);
         SellerProfile profile = sellerProfileRepo.findById(userId).orElse(new SellerProfile());
         profile.setId(userId);
         profile.setName(updateRequest.getName());
         profile.setEmail(updateRequest.getEmail());
         profile.setContactNumber(updateRequest.getContactNumber());
         profile.setStoreName(updateRequest.getStoreName());
-        return sellerProfileRepo.save(profile);
+        sellerProfileRepo.save(profile);
+        return new SellerProfileDTO(
+                user.getUsername(),
+                user.getEmail(),
+                profile.getContactNumber(),
+                profile.getStoreName());
     }
 
     public boolean existsById(String userId) {

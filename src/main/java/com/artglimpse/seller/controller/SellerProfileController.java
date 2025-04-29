@@ -2,7 +2,6 @@ package com.artglimpse.seller.controller;
 
 import com.artglimpse.seller.dto.SellerProfileDTO;
 import com.artglimpse.seller.dto.SellerProfileUpdateRequest;
-import com.artglimpse.seller.model.SellerProfile;
 import com.artglimpse.seller.service.SellerProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +24,9 @@ public class SellerProfileController {
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<SellerProfile> updateProfile(@RequestParam String userId,
+    public ResponseEntity<SellerProfileDTO> updateProfile(@RequestParam String userId,
             @RequestBody SellerProfileUpdateRequest updateRequest) {
-        SellerProfile savedProfile = sellerProfileService.updateSellerProfile(userId, updateRequest);
+        SellerProfileDTO savedProfile = sellerProfileService.updateSellerProfile(userId, updateRequest);
         return ResponseEntity.ok(savedProfile);
     }
 
