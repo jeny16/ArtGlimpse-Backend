@@ -16,4 +16,5 @@ This is the backend service for the **ArtGlimpse** e-commerce platform, built us
 
 ---
 
+![image](https://github.com/user-attachments/assets/6f683f78-8229-4c4f-b393-219861899407)
 
